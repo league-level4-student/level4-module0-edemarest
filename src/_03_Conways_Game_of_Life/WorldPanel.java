@@ -19,7 +19,7 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 	private Timer timer;
 	
 	//1. Create a 2D array of Cells. Do not initialize it.
-
+	Cell[][] cells;
 	
 	
 	public WorldPanel(int w, int h, int cpr) {
@@ -31,23 +31,37 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 		//2. Calculate the cell size.
 		
 		//3. Initialize the cell array to the appropriate size.
-		
+		cells = new Cell[cpr][cpr];
+		int cellSize = h/cpr;
 		//3. Iterate through the array and initialize each cell.
 		//   Don't forget to consider the cell's dimensions when 
 		//   passing in the location.
-		
+		for(int i = 0; i < cells.length; i++) {
+			for(int j = 0; j < cells[i].length; j++) {
+				cells[i][j] = new Cell(j*cellSize,i*cellSize,cellSize);
+			}
+		}
 	}
 	
 	public void randomizeCells() {
+		Random rand = new Random();
 		//4. Iterate through each cell and randomly set each
-		//   cell's isAlive memeber to true of false
-		
+		//   cell's isAlive member to true of false
+		for(int i = 0; i < cells.length; i++) {
+			for(int j = 0; j < cells[i].length; j++) {
+				cells[i][j].isAlive = rand.nextBoolean();
+			}
+		}
 		repaint();
 	}
 	
 	public void clearCells() {
 		//5. Iterate through the cells and set them all to dead.
-		
+		for(int i = 0; i < cells.length; i++) {
+			for(int j = 0; j < cells[i].length; j++) {
+				cells[i][j].isAlive=false;
+			}
+		}
 		repaint();
 	}
 	
@@ -66,22 +80,35 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 	@Override
 	public void paintComponent(Graphics g) {
 		//6. Iterate through the cells and draw them all
-		
+		for(int i = 0; i < cells.length; i++) {
+			for(int j = 0; j < cells[i].length; j++) {
+				cells[i][j].draw(g);
+				g.setColor(Color.BLACK);
+				g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+			}
+		}
 		
 		
 		// draws grid
-		g.setColor(Color.BLACK);
-		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+		
 	}
 	
 	//advances world one step
 	public void step() {
 		//7. iterate through cells and fill in the livingNeighbors array
 		// . using the getLivingNeighbors method.
-		int[][] livingNeighbors = new int[cellsPerRow][cellsPerRow];
-		
+		int[][] livingNeighbors = new int[cells.length][cells[1].length];
+		for(int i = 0; i < cells.length; i++) {
+			for(int j = 0; j < cells[i].length; j++) {
+				livingNeighbors[i][j] = getLivingNeighbors(i, j);
+			}
+		}
 		//8. check if each cell should live or die
-	
+		for(int i = 0; i < cells.length; i++) {
+			for(int j = 0; j < cells[i].length; j++) {
+				cells[i][j].liveOrDie(livingNeighbors[i][j]);
+			}
+		}
 		
 		
 		
@@ -93,7 +120,53 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 	//   living neighbors there are of the 
 	//   cell identified by x and y
 	public int getLivingNeighbors(int x, int y){
-		return 0;
+		int num = 0;
+	
+		if (y > 0) {
+			if (cells[x][y - 1].isAlive) {
+				num++;
+			}
+			if (x > 0) {
+				if (cells[x - 1][y - 1].isAlive) {
+					num++;
+				}
+			}
+			if (x < cells.length - 1) {
+				if (cells[x + 1][y - 1].isAlive) {
+					num++;
+				}
+			}
+		}
+		if (y < cells[0].length - 1) {
+			if (cells[x][y + 1].isAlive) {
+				num++;
+			}
+			if (x > 0) {
+				if (cells[x - 1][y + 1].isAlive) {
+					num++;
+				}
+			}
+			if (x < cells.length - 1) {
+				if (cells[x + 1][y + 1].isAlive) {
+					num++;
+				}
+			}
+		}
+		if (x > 0) {
+			if (cells[x - 1][y].isAlive) {
+				num++;
+			}
+		}
+		if (x < cells.length-1) {
+			if (cells[x + 1][y].isAlive) {
+				num++;
+			}
+		}
+		
+			
+			
+		
+		return num;
 	}
 
 	@Override
@@ -118,7 +191,14 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 		//10. Use e.getX() and e.getY() to determine
 		//    which cell is clicked. Then toggle
 		//    the isAlive variable for that cell.
-		
+		if(cells[e.getY()*cellSize][e.getX()*cellSize].isAlive) {
+		cells[e.getY()*cellSize][e.getX()*cellSize].isAlive = false;
+		}
+		else {
+			cells[e.getY()*cellSize][e.getX()*cellSize].isAlive = true;
+		}
+	
+	
 		
 		
 		
