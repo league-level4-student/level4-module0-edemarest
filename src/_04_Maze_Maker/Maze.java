@@ -16,11 +16,12 @@ public class Maze {
 		cells=new Cell[width][height];
 		//3. Iterated through each cell and initialize it
 		//   using i and j as the location
-		for(int i = 0; i < width;i++) {
-			for(int j = 0; j < height; j++) {
-				cells = new Cell[i][j];
+		for(int i = 0; i < 5;i++) {
+			for(int j = 0; j < 5; j++) {
+				cells[i][j] = new Cell(i,j);
 			}
 		}
+
 	}
 
 	//4. This method iterates through the cells and draws them
